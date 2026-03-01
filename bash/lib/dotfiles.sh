@@ -6,29 +6,14 @@ dotfiles-update() {
 }
 
 # Full cleanup for guest machines:
-# removes from .bashrc, uninstalls tracked deps, and deletes the repo directory.
+# runs uninstall, removes the data directory, and deletes the repo.
 dotfiles-nuke() {
-    local repo bashrc source_line deps_file
+    local repo data_dir
     repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-    bashrc="$HOME/.bashrc"
-    source_line="source \"$repo/bash/init.sh\""
-    deps_file="${XDG_DATA_HOME:-$HOME/.local/share}/nikitas_dotfiles/installed_deps"
+    data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/nikitas_dotfiles"
 
-    if grep -qF "$source_line" "$bashrc" 2>/dev/null; then
-        grep -vF "$source_line" "$bashrc" \
-            | grep -v '^# nikitas_dotfiles$' \
-            > "$bashrc.tmp"
-        mv "$bashrc.tmp" "$bashrc"
-    fi
-
-    if [[ -f "$deps_file" ]]; then
-        while IFS= read -r pkg; do
-            echo "Removing $pkg..."
-            sudo apt remove -y "$pkg"
-        done < "$deps_file"
-        rm -f "$deps_file"
-    fi
-
+    bash "$repo/uninstall.sh"
+    rm -rf "$data_dir"
     rm -rf "$repo"
     echo "Done. Open a new shell — no trace remains."
 }
