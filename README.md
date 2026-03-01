@@ -37,6 +37,34 @@ deletes the repo. Open a new shell afterwards — no trace remains.
 dotfiles-update
 ```
 
+## Commands
+
+### Navigation
+| Command | Description |
+|---|---|
+| `..` | Go up one directory |
+| `...` | Go up two directories |
+
+### Bookmarks
+| Command | Description |
+|---|---|
+| `bm [name]` | Bookmark current directory (defaults to dir name) |
+| `bj <name>` | Jump to a bookmark (tab completion supported) |
+| `brm <name>` | Remove a bookmark (tab completion supported) |
+| `bls` | List all bookmarks |
+
+### History
+| Key | Description |
+|---|---|
+| `↑ / ↓` | Search history by prefix (what you've already typed) |
+| `Ctrl+R` | Fuzzy search through full history with fzf |
+
+### Dotfiles
+| Command | Description |
+|---|---|
+| `dotfiles-update` | Pull latest changes from GitHub |
+| `dotfiles-nuke` | Full cleanup — remove everything, no trace remains |
+
 ## Adding functions
 
 Drop a new `*.sh` file into `bash/lib/`. It will be sourced automatically
@@ -54,8 +82,11 @@ nikitas_dotfiles/
 ├── bash/
 │   ├── init.sh         # sources all *.sh files from bash/lib/
 │   └── lib/
-│       ├── dotfiles.sh # dotfiles-update, dotfiles-nuke
-│       ├── history.sh  # arrow key history search + Ctrl+R fzf search
-│       └── utils.sh    # .. and ...
+│       ├── bookmarks.sh # bm, bj, brm, bls
+│       ├── dotfiles.sh  # dotfiles-update, dotfiles-nuke
+│       ├── history.sh   # arrow key history search + Ctrl+R fzf search
+│       └── utils.sh     # .. and ...
+├── tests/
+│   └── test_uninstall.sh
 └── README.md
 ```
