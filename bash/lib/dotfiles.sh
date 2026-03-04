@@ -1,3 +1,15 @@
+# Open Claude Code in the Claude config directory
+claude-config() {
+    cd ~/.claude && claude -c
+}
+
+# Open Claude Code in the dotfiles repo
+claude-dotfiles() {
+    local repo
+    repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+    cd "$repo" && claude -c
+}
+
 # Pull latest changes from GitHub
 dotfiles-update() {
     local repo
