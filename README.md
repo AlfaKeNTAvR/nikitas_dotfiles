@@ -52,6 +52,7 @@ dotfiles-update
 | `bmcd <name>` | Jump to a bookmark (tab completion supported) |
 | `bmrm <name>` | Remove a bookmark (tab completion supported) |
 | `bmls` | List all bookmarks |
+| `bm --help` | Show all bookmark commands |
 
 ### History
 | Key | Description |
@@ -64,6 +65,8 @@ dotfiles-update
 |---|---|
 | `dotfiles-update` | Pull latest changes from GitHub |
 | `dotfiles-nuke` | Full cleanup — remove everything, no trace remains |
+| `claude-config` | Open Claude Code in `~/.claude` |
+| `claude-dotfiles` | Open Claude Code in the dotfiles repo |
 
 ## Adding functions
 
@@ -83,7 +86,7 @@ nikitas_dotfiles/
 │   ├── init.sh         # sources all *.sh files from bash/lib/
 │   └── lib/
 │       ├── bookmarks.sh # bmadd, bmcd, bmrm, bmls
-│       ├── dotfiles.sh  # dotfiles-update, dotfiles-nuke
+│       ├── dotfiles.sh  # dotfiles-update, dotfiles-nuke, claude-config, claude-dotfiles
 │       ├── history.sh   # arrow key history search + Ctrl+R fzf search
 │       └── utils.sh     # .. and ...
 ├── tests/
