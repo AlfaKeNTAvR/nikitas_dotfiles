@@ -16,6 +16,17 @@ else
     echo "Not installed — nothing to do."
 fi
 
+TERMINATOR_CONFIG="${HOME}/.config/terminator/config"
+if [[ -f "$TERMINATOR_CONFIG" ]]; then
+    awk '
+        /^\[keybindings\]/ { skip=1; next }
+        skip && /^\[/ { skip=0 }
+        !skip { print }
+    ' "$TERMINATOR_CONFIG" > "$TERMINATOR_CONFIG.tmp"
+    mv "$TERMINATOR_CONFIG.tmp" "$TERMINATOR_CONFIG"
+    echo "Removed Terminator keybindings."
+fi
+
 if [[ -f "$DEPS_FILE" ]]; then
     while IFS= read -r pkg; do
         echo "Removing $pkg..."

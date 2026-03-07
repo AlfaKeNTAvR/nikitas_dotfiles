@@ -25,3 +25,5 @@ else
 fi
 
 ensure_dep fzf
+ensure_dep terminator
+bash "$DOTFILES_DIR/setup/terminator.sh"
