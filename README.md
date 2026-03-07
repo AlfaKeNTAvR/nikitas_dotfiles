@@ -48,11 +48,11 @@ dotfiles-update
 ### Bookmarks
 | Command | Description |
 |---|---|
-| `bmadd [name]` | Bookmark current directory (defaults to dir name) |
-| `bmcd <name>` | Jump to a bookmark (tab completion supported) |
-| `bmrm <name>` | Remove a bookmark (tab completion supported) |
-| `bmls` | List all bookmarks |
-| `bm --help` | Show all bookmark commands |
+| `badd [name]` | Bookmark current directory (defaults to dir name) |
+| `bcd <name>` | Jump to a bookmark (tab completion supported) |
+| `brm <name>` | Remove a bookmark (tab completion supported) |
+| `bls` | List all bookmarks |
+| `b` / `b --help` | Show all bookmark commands |
 
 ### History
 | Key | Description |
@@ -85,10 +85,12 @@ nikitas_dotfiles/
 ├── bash/
 │   ├── init.sh         # sources all *.sh files from bash/lib/
 │   └── lib/
-│       ├── bookmarks.sh # bmadd, bmcd, bmrm, bmls
+│       ├── bookmarks.sh # badd, bcd, brm, bls, b
 │       ├── dotfiles.sh  # dotfiles-update, dotfiles-nuke, claude-config, claude-dotfiles
 │       ├── history.sh   # arrow key history search + Ctrl+R fzf search
 │       └── utils.sh     # .. and ...
+├── setup/
+│   └── terminator.sh   # apply custom Terminator keybindings
 ├── tests/
 │   └── test_uninstall.sh
 └── README.md
