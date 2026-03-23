@@ -17,20 +17,33 @@ else
 fi
 
 TERMINATOR_CONFIG="${HOME}/.config/terminator/config"
-if [[ -f "$TERMINATOR_CONFIG" ]]; then
+TERMINATOR_BACKUP="${XDG_DATA_HOME:-$HOME/.local/share}/nikitas_dotfiles/terminator.config.bak"
+if [[ -f "$TERMINATOR_BACKUP" ]]; then
+    cp "$TERMINATOR_BACKUP" "$TERMINATOR_CONFIG"
+    rm -f "$TERMINATOR_BACKUP"
+    echo "Restored original Terminator config."
+elif [[ -f "$TERMINATOR_CONFIG" ]]; then
     awk '
         /^\[keybindings\]/ { skip=1; next }
+        /^\[profiles\]/ { skip=1; next }
         skip && /^\[/ { skip=0 }
         !skip { print }
     ' "$TERMINATOR_CONFIG" > "$TERMINATOR_CONFIG.tmp"
     mv "$TERMINATOR_CONFIG.tmp" "$TERMINATOR_CONFIG"
-    echo "Removed Terminator keybindings."
+    echo "Removed Terminator settings (no backup found)."
 fi
 
 if [[ -f "$DEPS_FILE" ]]; then
     while IFS= read -r pkg; do
-        echo "Removing $pkg..."
-        sudo apt remove -y "$pkg"
+        # Skip if other installed packages depend on this one
+        rdeps="$(apt-cache rdepends --installed "$pkg" 2>/dev/null \
+                 | tail -n +3 | sed 's/^ *//' | grep -v "^$pkg$" || true)"
+        if [[ -n "$rdeps" ]]; then
+            echo "Keeping $pkg — required by: $(echo "$rdeps" | paste -sd ', ')"
+        else
+            echo "Removing $pkg..."
+            sudo apt remove -y "$pkg"
+        fi
     done < "$DEPS_FILE"
     rm -f "$DEPS_FILE"
 fi

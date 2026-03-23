@@ -17,8 +17,9 @@ source ~/.bashrc
 bash ~/nikitas_dotfiles/uninstall.sh
 ```
 
-Removes the source line from `~/.bashrc` and uninstalls any dependencies that
-were installed by the script. Open a new shell to take effect.
+Removes the source line from `~/.bashrc`, restores the original Terminator
+config, and uninstalls any dependencies that were installed by the script.
+Open a new shell to take effect.
 
 ## Full removal (guest machine)
 
@@ -90,8 +91,12 @@ nikitas_dotfiles/
 │       ├── history.sh   # arrow key history search + Ctrl+R fzf search
 │       └── utils.sh     # .. and ...
 ├── setup/
-│   └── terminator.sh   # apply custom Terminator keybindings
+│   └── terminator.sh   # apply custom Terminator keybindings & profile settings
 ├── tests/
 │   └── test_uninstall.sh
 └── README.md
 ```
+
+## TODO
+
+- [ ] Test conditional package removal (reverse-dependency check via `apt-cache rdepends --installed` in `uninstall.sh`)

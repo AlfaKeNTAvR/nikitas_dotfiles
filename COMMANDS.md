@@ -14,7 +14,14 @@
 |---|---|
 | `Super+Left/Right` | Snap window to left/right half of screen |
 | `Super+Shift+Left/Right` | Move window to previous/next monitor |
-| `Super+Tab` / `Alt+Tab` | Switch focus between apps |
+| `Super+Tab` | Switch focus between apps |
+| `Super+Esc` | Switch focus between open windows |
+| `Super+\`` | Switch between windows of the same app |
+| `Super+Page Up/Down` | Switch workspaces |
+| `Super+Shift+Page Up/Down` | Move focused window to another workspace |
+| `Super+Up` | Un-snap window (required before moving a snapped window to another monitor) |
+
+> To move a snapped window to another monitor: `Super+Up` → `Super+Shift+Left/Right` → `Super+Left/Right` to re-snap.
 
 ## Terminator
 | Shortcut | Description |
@@ -30,6 +37,10 @@
   zoom_out = <Primary>minus
   split_horiz = <Alt>underscore
   split_vert = <Alt>plus
+[profiles]
+  [[default]]
+    icon_bell = False
+    scroll_on_output = False
 ```
 
 ## Ubuntu Settings
