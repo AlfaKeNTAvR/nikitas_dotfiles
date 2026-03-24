@@ -37,6 +37,8 @@ cat >> "$CONFIG" <<'EOF'
   zoom_out = <Primary>minus
   split_horiz = <Alt>underscore
   split_vert = <Alt>plus
+  broadcast_all = <Shift><Alt>b
+  broadcast_off = <Shift><Alt>o
 [profiles]
   [[default]]
     icon_bell = False

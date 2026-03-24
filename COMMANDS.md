@@ -28,6 +28,8 @@
 |---|---|
 | `Alt+Shift+-` | Split horizontally |
 | `Alt+Shift++` | Split vertically |
+| `Shift+Alt+B` | Broadcast input to all panes |
+| `Shift+Alt+O` | Broadcast off (focused pane only) |
 | `Ctrl+D` | Close terminal |
 
 ### Config (`~/.config/terminator/config`)
@@ -37,6 +39,8 @@
   zoom_out = <Primary>minus
   split_horiz = <Alt>underscore
   split_vert = <Alt>plus
+  broadcast_all = <Shift><Alt>b
+  broadcast_off = <Shift><Alt>o
 [profiles]
   [[default]]
     icon_bell = False
