@@ -17,7 +17,7 @@ source ~/.bashrc
 bash ~/nikitas_dotfiles/uninstall.sh
 ```
 
-Removes the source line from `~/.bashrc`, restores the original Terminator
+Removes the source line from `~/.bashrc`, restores the original wezterm
 config, and uninstalls any dependencies that were installed by the script.
 Open a new shell to take effect.
 
@@ -91,7 +91,7 @@ nikitas_dotfiles/
 │       ├── history.sh   # arrow key history search + Ctrl+R fzf search
 │       └── utils.sh     # .. and ...
 ├── setup/
-│   └── terminator.sh   # apply custom Terminator keybindings & profile settings
+│   └── wezterm.sh      # install managed wezterm config (keybindings, bell off)
 ├── tests/
 │   └── test_uninstall.sh
 └── README.md

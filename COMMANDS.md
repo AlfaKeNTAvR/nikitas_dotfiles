@@ -23,29 +23,24 @@
 
 > To move a snapped window to another monitor: `Super+Up` → `Super+Shift+Left/Right` → `Super+Left/Right` to re-snap.
 
-## Terminator
+## WezTerm
 | Shortcut | Description |
 |---|---|
-| `Alt+Shift+-` | Split horizontally |
-| `Alt+Shift++` | Split vertically |
-| `Shift+Alt+B` | Broadcast input to all panes |
-| `Shift+Alt+O` | Broadcast off (focused pane only) |
-| `Ctrl+D` | Close terminal |
+| `Ctrl+=` | Zoom in (increase font size) |
+| `Ctrl+-` | Zoom out (decrease font size) |
+| `Ctrl+0` | Reset font size |
+| `Alt+Shift+-` | Split top/bottom |
+| `Alt+Shift++` | Split left/right |
+| `Ctrl+D` | Close pane (shell EOF) |
 
-### Config (`~/.config/terminator/config`)
-```ini
-[keybindings]
-  zoom_in = <Primary>equal
-  zoom_out = <Primary>minus
-  split_horiz = <Alt>underscore
-  split_vert = <Alt>plus
-  broadcast_all = <Shift><Alt>b
-  broadcast_off = <Shift><Alt>o
-[profiles]
-  [[default]]
-    icon_bell = False
-    scroll_on_output = False
-```
+> Split keys are bound on the physical key position (so `Alt+Shift` combos fire
+> regardless of keyboard layout). `Alt+Shift+-` splits top/bottom, `Alt+Shift++`
+> splits left/right.
+>
+> **No broadcast:** WezTerm has no native broadcast-to-all-panes equivalent.
+
+### Config (`~/.config/wezterm/wezterm.lua`)
+Managed copy of `wezterm/wezterm.lua` from this repo. The audible bell is disabled.
 
 ## Ubuntu Settings
 | Command | Description |

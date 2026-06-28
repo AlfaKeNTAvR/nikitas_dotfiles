@@ -15,7 +15,7 @@ Checklist for any new feature that touches the host:
 
 1. **Config files** — back up the original to `$XDG_DATA_HOME/nikitas_dotfiles/`
    before modifying. `uninstall.sh` restores from the backup. See
-   `setup/terminator.sh` for the pattern.
+   `setup/wezterm.sh` for the pattern.
 2. **Packages** — install via `ensure_dep <pkg>` so they're tracked in
    `installed_deps`. On uninstall, check reverse dependencies with
    `apt-cache rdepends --installed` before removing — never remove a package
@@ -23,7 +23,11 @@ Checklist for any new feature that touches the host:
    Ubuntu, or any other software already on the machine.
 3. **Dotfiles (`.bashrc`, etc.)** — append with a marker; remove by grepping
    out the marker.
-4. **Anything else** (systemd units, cron jobs, symlinks, etc.) — record what
+4. **Apt repos / signing keys** — only add if missing, and record each file
+   created in `added_apt_files` so `uninstall.sh` removes only what was added
+   (never a repo the machine already had). See `ensure_wezterm_repo` in
+   `install.sh` for the pattern.
+5. **Anything else** (systemd units, cron jobs, symlinks, etc.) — record what
    was added and write the removal logic in `uninstall.sh`.
 
 If a change can't be cleanly reversed, don't make it automatically — document
@@ -35,7 +39,7 @@ it as a manual step instead.
 - `uninstall.sh` — reverses everything install did (restores original configs from backups)
 - `bash/init.sh` — sources all `*.sh` files from `bash/lib/`
 - `bash/lib/*.sh` — individual feature modules (bookmarks, history, dotfiles commands, etc.)
-- `setup/*.sh` — one-time configuration scripts (e.g., Terminator settings)
+- `setup/*.sh` — one-time configuration scripts (e.g., wezterm settings)
 
 ## Conventions
 
