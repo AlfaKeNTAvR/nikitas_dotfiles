@@ -53,6 +53,16 @@ wezterm.on("open-uri", function(_, _, uri)
 	end
 end)
 
+-- Open on the left half of the active screen (full height) by default, like a
+-- Super+Left snap. Sized from the active screen's geometry at startup.
+wezterm.on("gui-startup", function(cmd)
+	local active = wezterm.gui.screens().active
+	local _, _, window = wezterm.mux.spawn_window(cmd or {})
+	local gui = window:gui_window()
+	gui:set_position(active.x, active.y)
+	gui:set_inner_size(active.width / 2, active.height)
+end)
+
 config.keys = {
 	-- Zoom: Ctrl+= / Ctrl+- , with Ctrl+0 to reset (Terminator zoom_in/zoom_out).
 	{ key = "=", mods = "CTRL", action = act.IncreaseFontSize },
