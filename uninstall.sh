@@ -29,6 +29,14 @@ elif [[ -f "$WEZTERM_CONFIG" ]] && head -n1 "$WEZTERM_CONFIG" | grep -qF 'nikita
     echo "Removed wezterm config."
 fi
 
+# Remove the Nerd Font we installed (lives in our own subdir).
+FONT_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/fonts/nikitas_dotfiles"
+if [[ -d "$FONT_DIR" ]]; then
+    rm -rf "$FONT_DIR"
+    fc-cache -f >/dev/null 2>&1 || true
+    echo "Removed installed Nerd Font."
+fi
+
 if [[ -f "$DEPS_FILE" ]]; then
     while IFS= read -r pkg; do
         # Skip if other installed packages depend on this one

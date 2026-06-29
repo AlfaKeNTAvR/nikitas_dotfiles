@@ -13,6 +13,46 @@ local config = wezterm.config_builder()
 --  needs no equivalent here.)
 config.audible_bell = "Disabled"
 
+-- JetBrainsMono Nerd Font (installed by setup/fonts.sh). The Nerd Font glyphs
+-- render the eza icons and the git branch symbol in the prompt.
+config.font = wezterm.font("JetBrainsMono Nerd Font")
+
+-- Tab titles as "N:name", where name is the active pane's folder (or its title
+-- when there's no folder).
+wezterm.on("format-tab-title", function(tab)
+	local function basename(path)
+		return (path:gsub("[/\\]+$", ""):gsub(".*[/\\]", ""))
+	end
+	local title = tab.tab_title
+	if title == nil or #title == 0 then
+		local cwd = tab.active_pane.current_working_dir
+		if cwd ~= nil then
+			title = basename(cwd.file_path or tostring(cwd))
+		else
+			title = tab.active_pane.title
+		end
+	end
+	return string.format(" %d:%s ", tab.tab_index + 1, title)
+end)
+
+-- Open file:// links (eza --hyperlink output) in VSCode. Other links (http/https,
+-- e.g. the prompt's branch link) fall through to default handling (browser).
+-- Ctrl+Click a link to open it.
+wezterm.on("open-uri", function(_, _, uri)
+	local path = uri:match("^file://[^/]*(/.*)$")
+	if path then
+		-- Percent-decode (eza encodes spaces etc. as %20).
+		path = path:gsub("%%(%x%x)", function(h)
+			return string.char(tonumber(h, 16))
+		end)
+		-- No "--" here on purpose: VSCode's CLI re-injects the instance's launch
+		-- flags (e.g. --ozone-platform=x11), and a "--" would turn that flag into
+		-- a bogus filename. Paths from eza are absolute, so "--" isn't needed.
+		wezterm.background_child_process({ "code", path })
+		return false -- handled; skip default
+	end
+end)
+
 config.keys = {
 	-- Zoom: Ctrl+= / Ctrl+- , with Ctrl+0 to reset (Terminator zoom_in/zoom_out).
 	{ key = "=", mods = "CTRL", action = act.IncreaseFontSize },

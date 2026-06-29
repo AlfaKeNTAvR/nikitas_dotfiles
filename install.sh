@@ -62,3 +62,9 @@ if ! command -v wezterm &>/dev/null; then
 fi
 ensure_dep wezterm
 bash "$DOTFILES_DIR/setup/wezterm.sh"
+
+# eza powers the ls icons; the Nerd Font (via fonts.sh) renders them.
+ensure_dep eza
+ensure_dep curl
+ensure_dep unzip
+bash "$DOTFILES_DIR/setup/fonts.sh"

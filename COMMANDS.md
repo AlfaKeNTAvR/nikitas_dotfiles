@@ -32,6 +32,7 @@
 | `Alt+Shift+-` | Split top/bottom |
 | `Alt+Shift++` | Split left/right |
 | `Ctrl+D` | Close pane (shell EOF) |
+| `Ctrl+Click` (on a file/folder in `ls`) | Open it in VSCode |
 
 > Split keys are bound on the physical key position (so `Alt+Shift` combos fire
 > regardless of keyboard layout). `Alt+Shift+-` splits top/bottom, `Alt+Shift++`
@@ -40,7 +41,18 @@
 > **No broadcast:** WezTerm has no native broadcast-to-all-panes equivalent.
 
 ### Config (`~/.config/wezterm/wezterm.lua`)
-Managed copy of `wezterm/wezterm.lua` from this repo. The audible bell is disabled.
+Managed copy of `wezterm/wezterm.lua` from this repo. Sets JetBrainsMono Nerd
+Font, disables the audible bell, formats tabs as `N:folder`, and routes
+`file://` link clicks to VSCode. The font is installed by `setup/fonts.sh`.
+
+## Shell prompt & listings
+| Command | Description |
+|---|---|
+| `ls` / `ll` / `la` / `lt` | `eza` with icons, git status, and clickable (hyperlinked) entries |
+
+> The prompt is two lines: `(env) folder  branch` then the input line below.
+> The branch is a clickable link to the repo's web page. Requires a Nerd Font
+> (installed via `setup/fonts.sh`) for the icons and branch glyph.
 
 ## Ubuntu Settings
 | Command | Description |
