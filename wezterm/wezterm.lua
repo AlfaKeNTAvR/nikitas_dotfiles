@@ -77,6 +77,12 @@ config.keys = {
 	-- character matching ("_"/"+") silently fails under ALT; physical position does not.
 	{ key = "phys:Minus", mods = "ALT|SHIFT", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
 	{ key = "phys:Equal", mods = "ALT|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+
+	-- Pane navigation: Alt+Arrow moves focus to the pane in that direction.
+	{ key = "LeftArrow", mods = "ALT", action = act.ActivatePaneDirection("Left") },
+	{ key = "RightArrow", mods = "ALT", action = act.ActivatePaneDirection("Right") },
+	{ key = "UpArrow", mods = "ALT", action = act.ActivatePaneDirection("Up") },
+	{ key = "DownArrow", mods = "ALT", action = act.ActivatePaneDirection("Down") },
 }
 
 -- Require Ctrl+Click to open links. By default wezterm opens a link on a plain
