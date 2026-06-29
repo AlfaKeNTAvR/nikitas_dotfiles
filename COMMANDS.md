@@ -51,7 +51,8 @@ Font, disables the audible bell, formats tabs as `N:folder`, and routes
 | `ls` / `ll` / `la` / `lt` | `eza` with icons, git status, and clickable (hyperlinked) entries |
 
 > The prompt is two lines: `(env) folder  branch` then the input line below.
-> The branch is a clickable link to the repo's web page. Requires a Nerd Font
+> The folder is a clickable link that opens the current directory in VSCode; the
+> branch is a clickable link to the repo's web page. Requires a Nerd Font
 > (installed via `setup/fonts.sh`) for the icons and branch glyph.
 
 ## Ubuntu Settings

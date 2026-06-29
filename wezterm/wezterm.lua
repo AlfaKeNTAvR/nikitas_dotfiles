@@ -69,6 +69,31 @@ config.keys = {
 	{ key = "phys:Equal", mods = "ALT|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
 }
 
+-- Require Ctrl+Click to open links. By default wezterm opens a link on a plain
+-- left click (its default Up binding is CompleteSelectionOrOpenLinkAtMouseCursor);
+-- these bindings make a plain click only complete a selection, and move the
+-- link-open onto Ctrl+Click.
+config.mouse_bindings = {
+	-- Plain left click: finish a selection, never open a link.
+	{
+		event = { Up = { streak = 1, button = "Left" } },
+		mods = "NONE",
+		action = act.CompleteSelection("ClipboardAndPrimarySelection"),
+	},
+	-- Ctrl + left click: open the link under the mouse.
+	{
+		event = { Up = { streak = 1, button = "Left" } },
+		mods = "CTRL",
+		action = act.OpenLinkAtMouseCursor,
+	},
+	-- Suppress the selection that the Ctrl mouse-down would otherwise start.
+	{
+		event = { Down = { streak = 1, button = "Left" } },
+		mods = "CTRL",
+		action = act.Nop,
+	},
+}
+
 -- Broadcast-to-all-panes (Terminator's Shift+Alt+B / Shift+Alt+O) has no native
 -- wezterm equivalent and is intentionally omitted. Keep Terminator around if you
 -- need that workflow.
