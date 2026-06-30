@@ -8,6 +8,13 @@ local act = wezterm.action
 
 local config = wezterm.config_builder()
 
+-- Platform flag + the VSCode launcher used by the open-uri handler below.
+-- On Windows the `code` command is a .cmd (not spawnable by
+-- background_child_process), so we launch Code.exe directly. home_dir keeps
+-- this user-agnostic; adjust if VSCode is installed outside the user profile.
+local is_windows = wezterm.target_triple:find("windows") ~= nil
+local vscode_exe = wezterm.home_dir .. "/AppData/Local/Programs/Microsoft VS Code/Code.exe"
+
 -- No bell. Matches Terminator's icon_bell = False.
 -- (wezterm never scrolls on output, so Terminator's scroll_on_output = False
 --  needs no equivalent here.)
@@ -16,6 +23,7 @@ config.audible_bell = "Disabled"
 -- JetBrainsMono Nerd Font (installed by setup/fonts.sh). The Nerd Font glyphs
 -- render the eza icons and the git branch symbol in the prompt.
 config.font = wezterm.font("JetBrainsMono Nerd Font")
+config.font_size = 11.0
 
 -- Tab titles as "N:name", where name is the active pane's folder (or its title
 -- when there's no folder).
@@ -35,9 +43,9 @@ wezterm.on("format-tab-title", function(tab)
 	return string.format(" %d:%s ", tab.tab_index + 1, title)
 end)
 
--- Open file:// links (eza --hyperlink output) in VSCode. Other links (http/https,
--- e.g. the prompt's branch link) fall through to default handling (browser).
--- Ctrl+Click a link to open it.
+-- Open file:// links (the prompt's folder link and eza --hyperlink output) in
+-- VSCode. Other links (http/https, e.g. the prompt's branch link) fall through
+-- to default handling (browser). Ctrl+Click a link to open it.
 wezterm.on("open-uri", function(_, _, uri)
 	local path = uri:match("^file://[^/]*(/.*)$")
 	if path then
@@ -45,10 +53,18 @@ wezterm.on("open-uri", function(_, _, uri)
 		path = path:gsub("%%(%x%x)", function(h)
 			return string.char(tonumber(h, 16))
 		end)
-		-- No "--" here on purpose: VSCode's CLI re-injects the instance's launch
-		-- flags (e.g. --ozone-platform=x11), and a "--" would turn that flag into
-		-- a bogus filename. Paths from eza are absolute, so "--" isn't needed.
-		wezterm.background_child_process({ "code", path })
+		if is_windows then
+			-- Git-Bash paths look like /c/Users/...; VSCode needs C:/Users/...
+			path = path:gsub("^/(%a)/", function(d)
+				return d:upper() .. ":/"
+			end)
+			wezterm.background_child_process({ vscode_exe, path })
+		else
+			-- No "--" here on purpose: VSCode's CLI re-injects the instance's launch
+			-- flags (e.g. --ozone-platform=x11), and a "--" would turn that flag into
+			-- a bogus filename. Paths from eza are absolute, so "--" isn't needed.
+			wezterm.background_child_process({ "code", path })
+		end
 		return false -- handled; skip default
 	end
 end)

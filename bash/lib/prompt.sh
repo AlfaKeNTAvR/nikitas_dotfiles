@@ -5,6 +5,13 @@
 # Nerd Font git-branch glyph (U+E0A0). Shows as a box without a Nerd Font.
 __NIKITA_BRANCH_GLYPH=$''
 
+# Prompt symbol on the input line. '>' on Windows (Git Bash) to match the native
+# shell convention; '\$' elsewhere (the \$ stays root-aware: '#' when UID 0).
+case "$OSTYPE" in
+    msys*|cygwin*) __NIKITA_PROMPT_SYMBOL='>' ;;
+    *)             __NIKITA_PROMPT_SYMBOL='\$' ;;
+esac
+
 # Percent-encode a path for use in a file:// URL (spaces, etc.). wezterm's
 # open-uri handler percent-decodes before handing the path to VSCode.
 __nikita_url_encode() {
@@ -67,7 +74,7 @@ __nikita_set_prompt() {
     # in VSCode (same open-uri handler that routes eza's file:// links).
     local dir_url; dir_url="file://$(__nikita_url_encode "$PWD")"
     local dir_seg="\[\e[1;36m\e]8;;${dir_url}\a\]\W\[\e]8;;\a\e[0m\]"
-    PS1="${env_seg}${dir_seg}${git_seg}\n\$ "
+    PS1="${env_seg}${dir_seg}${git_seg}\n${__NIKITA_PROMPT_SYMBOL} "
 }
 
 # Register without clobbering any existing PROMPT_COMMAND (e.g. conda's hooks).

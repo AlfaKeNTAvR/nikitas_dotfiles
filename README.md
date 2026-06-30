@@ -11,6 +11,56 @@ bash ~/nikitas_dotfiles/install.sh
 source ~/.bashrc
 ```
 
+## Windows (manual setup)
+
+`install.sh` is `apt`-based and Ubuntu-only. On Windows there's no installer —
+WezTerm launches Git Bash, which sources the same dotfiles, so the prompt,
+bookmarks, history, and eza listings all carry over.
+
+**Prerequisites** (install once):
+
+- [WezTerm](https://wezfurlong.org/wezterm/install/windows.html)
+- [Git for Windows](https://git-scm.com/download/win) — provides the `bash.exe`
+  WezTerm launches.
+- eza (optional, for `ls` icons): `winget install eza-community.eza`
+- VS Code (optional, for Ctrl+Click to open files/folders) — a standard user
+  install is auto-detected; for a system-wide install in `Program Files`, edit
+  `vscode_exe` in `wezterm.lua`.
+
+**Setup:**
+
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/AlfaKeNTAvR/nikitas_dotfiles "$USERPROFILE/nikitas_dotfiles"
+   ```
+2. From Git Bash, point your shell at the dotfiles (adjust the path to where you
+   cloned):
+   ```bash
+   printf '\n# nikitas_dotfiles\nsource "/c/Users/<you>/nikitas_dotfiles/bash/init.sh"\n' >> ~/.bashrc
+   printf '[[ -f ~/.bashrc ]] && source ~/.bashrc\n' >> ~/.bash_profile
+   ```
+3. Copy the WezTerm config and apply the two Windows-specific changes:
+   ```bash
+   mkdir -p ~/.config/wezterm
+   cp ~/nikitas_dotfiles/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
+   ```
+   Then edit `~/.config/wezterm/wezterm.lua`:
+   - Add `default_prog` so WezTerm launches Git Bash as a login+interactive
+     shell (adjust the path to your Git install):
+     ```lua
+     config.default_prog = { "C:/Program Files/Git/usr/bin/bash.exe", "-l", "-i" }
+     ```
+   - Change the font to the built-in `wezterm.font("JetBrains Mono")` — the
+     separately-installed Nerd Font isn't reliably picked up on Windows. Icon
+     glyphs still render via WezTerm's bundled "Symbols Nerd Font" fallback.
+
+Restart WezTerm to take effect.
+
+**Differences from Ubuntu:**
+
+- The prompt ends with `>` instead of `$` (matches the native Windows shell).
+- The git-branch glyph shows as a box unless a Nerd Font is loaded.
+
 ## Uninstall (keep repo)
 
 ```bash
