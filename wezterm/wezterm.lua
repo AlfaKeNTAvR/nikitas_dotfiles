@@ -8,6 +8,12 @@ local act = wezterm.action
 
 local config = wezterm.config_builder()
 
+-- Use Git Bash as the default shell on Windows so the dotfiles prompt,
+-- Ctrl+D, and bash integrations work out of the box.
+if wezterm.target_triple:find("windows") then
+	config.default_prog = { "C:/Program Files/Git/bin/bash.exe", "--login", "-i" }
+end
+
 -- Platform flag + the VSCode launcher used by the open-uri handler below.
 -- On Windows the `code` command is a .cmd (not spawnable by
 -- background_child_process), so we launch Code.exe directly. home_dir keeps
@@ -20,10 +26,22 @@ local vscode_exe = wezterm.home_dir .. "/AppData/Local/Programs/Microsoft VS Cod
 --  needs no equivalent here.)
 config.audible_bell = "Disabled"
 
--- JetBrainsMono Nerd Font (installed by setup/fonts.sh). The Nerd Font glyphs
--- render the eza icons and the git branch symbol in the prompt.
-config.font = wezterm.font("JetBrainsMono Nerd Font")
 config.font_size = 11.0
+
+-- WSL domain for Ubuntu. Splits from a WSL pane stay in WSL automatically
+-- (thanks to domain = "CurrentPaneDomain" on the split keybindings).
+config.wsl_domains = {
+	{
+		name = "WSL:Ubuntu",
+		distribution = "Ubuntu-24.04",
+		default_cwd = "~",
+	},
+}
+-- SSH domains. Add entries here to get persistent SSH tabs where splits open
+-- new channels on the same host without re-authenticating.
+-- Example:
+--   { name = "SSH:mybox", remote_address = "mybox.example.com", username = "nikita" },
+config.ssh_domains = {}
 
 -- Tab titles as "N:name", where name is the active pane's folder (or its title
 -- when there's no folder).
@@ -99,6 +117,9 @@ config.keys = {
 	{ key = "RightArrow", mods = "ALT", action = act.ActivatePaneDirection("Right") },
 	{ key = "UpArrow", mods = "ALT", action = act.ActivatePaneDirection("Up") },
 	{ key = "DownArrow", mods = "ALT", action = act.ActivatePaneDirection("Down") },
+
+	-- Open a new tab in WSL Ubuntu.
+	{ key = "w", mods = "CTRL|SHIFT", action = act.SpawnTab({ DomainName = "WSL:Ubuntu" }) },
 }
 
 -- Require Ctrl+Click to open links. By default wezterm opens a link on a plain
