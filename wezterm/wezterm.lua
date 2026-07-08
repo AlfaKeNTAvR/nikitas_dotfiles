@@ -83,6 +83,11 @@ config.keys = {
 	{ key = "RightArrow", mods = "ALT", action = act.ActivatePaneDirection("Right") },
 	{ key = "UpArrow", mods = "ALT", action = act.ActivatePaneDirection("Up") },
 	{ key = "DownArrow", mods = "ALT", action = act.ActivatePaneDirection("Down") },
+
+	-- Ctrl+Backspace deletes the previous word. By default the terminal sends a
+	-- plain delete for it (removing one character); send the ESC+DEL sequence that
+	-- Alt+Backspace produces so readline runs backward-kill-word instead.
+	{ key = "Backspace", mods = "CTRL", action = act.SendString("\x1b\x7f") },
 }
 
 -- Require Ctrl+Click to open links. By default wezterm opens a link on a plain
