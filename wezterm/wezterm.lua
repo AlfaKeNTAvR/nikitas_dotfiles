@@ -120,6 +120,11 @@ config.keys = {
 
 	-- Open a new tab in WSL Ubuntu.
 	{ key = "w", mods = "CTRL|SHIFT", action = act.SpawnTab({ DomainName = "WSL:Ubuntu" }) },
+
+	-- Ctrl+Backspace deletes the previous word. By default the terminal sends a
+	-- plain delete for it (removing one character); send the ESC+DEL sequence that
+	-- Alt+Backspace produces so readline runs backward-kill-word instead.
+	{ key = "Backspace", mods = "CTRL", action = act.SendString("\x1b\x7f") },
 }
 
 -- Require Ctrl+Click to open links. By default wezterm opens a link on a plain
