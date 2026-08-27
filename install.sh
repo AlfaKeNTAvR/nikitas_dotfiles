@@ -78,6 +78,12 @@ ensure_dep curl
 ensure_dep unzip
 bash "$DOTFILES_DIR/setup/fonts.sh"
 
+# The Nerd Font covers the icon glyphs but not the Misc Technical media-control
+# block (U+23E9-U+23FA), which shows as tofu without it. Noto Sans Symbols 2
+# covers that range; WezTerm picks it up through fontconfig fallback, so no
+# wezterm.lua change is needed.
+ensure_dep fonts-noto-core
+
 # Clipboard bridge for terminal tools that read images/text off the clipboard
 # (e.g. pasting an image into Claude Code). They probe xclip first, then
 # wl-paste, so both are installed to cover X11 and Wayland sessions alike.

@@ -2,7 +2,7 @@
 
 Modular bash functions and aliases, installable on any machine with a single
 clone + script. Installs any missing dependencies automatically: fzf, wezterm,
-eza, and the xclip / wl-clipboard clipboard bridge.
+eza, the Noto symbol fonts, and the xclip / wl-clipboard clipboard bridge.
 
 ## Install
 
