@@ -26,6 +26,16 @@ local vscode_exe = wezterm.home_dir .. "/AppData/Local/Programs/Microsoft VS Cod
 --  needs no equivalent here.)
 config.audible_bell = "Disabled"
 
+-- Run under XWayland rather than as a native Wayland client. On GNOME/Wayland
+-- this wezterm release ignores the compositor's tiled resize, so Super+Left /
+-- Super+Right did nothing until the window was dragged, and wezterm had to draw
+-- its own title bar (Wayland has no server-side decorations). X11 restores both
+-- the GNOME title bar and window snapping, and makes the gui-startup snap below
+-- work at all: set_position is a no-op on Wayland.
+-- Trade-off: the compositor upscales XWayland windows, so text is softer on
+-- fractionally-scaled monitors.
+config.enable_wayland = false
+
 config.font_size = 11.0
 
 -- WSL domain for Ubuntu. Splits from a WSL pane stay in WSL automatically
