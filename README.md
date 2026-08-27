@@ -1,7 +1,8 @@
 # nikitas_dotfiles
 
 Modular bash functions and aliases, installable on any machine with a single
-clone + script. Installs `fzf` automatically if missing.
+clone + script. Installs any missing dependencies automatically: fzf, wezterm,
+eza, and the xclip / wl-clipboard clipboard bridge.
 
 ## Install
 
@@ -126,6 +127,9 @@ the next time a shell loads (or after `source ~/.bashrc`).
 
 To add a system dependency, call `ensure_dep <package>` in `install.sh`.
 It installs only if missing and tracks it for clean removal on uninstall.
+Presence is checked against the apt package name via `dpkg-query`, not the
+binary name, so packages whose binaries differ from the package name (e.g.
+`wl-clipboard` shipping `wl-copy` / `wl-paste`) are detected correctly.
 
 ## Layout
 

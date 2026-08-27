@@ -8,10 +8,19 @@ DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nikitas_dotfiles"
 DEPS_FILE="$DATA_DIR/installed_deps"
 APT_FILES_LOG="$DATA_DIR/added_apt_files"
 
+# True only when the apt package is fully installed. Checked instead of the
+# binary name because a package need not ship a binary matching its own name
+# (wl-clipboard provides wl-copy/wl-paste), and dpkg still knows packages that
+# were removed but left their config behind.
+is_pkg_installed() {
+    local pkg="$1"
+    [[ "$(dpkg-query -W -f='${db:Status-Status}' "$pkg" 2>/dev/null)" == "installed" ]]
+}
+
 # Install a package only if missing; record it so uninstall can clean up
 ensure_dep() {
     local pkg="$1"
-    if ! command -v "$pkg" &>/dev/null; then
+    if ! is_pkg_installed "$pkg"; then
         echo "Installing $pkg..."
         sudo apt install -y "$pkg"
         mkdir -p "$(dirname "$DEPS_FILE")"
@@ -56,7 +65,7 @@ fi
 ensure_dep fzf
 
 # wezterm lives in its own apt repo, so add that before installing it.
-if ! command -v wezterm &>/dev/null; then
+if ! is_pkg_installed wezterm; then
     ensure_dep curl
     ensure_wezterm_repo
 fi
@@ -68,3 +77,9 @@ ensure_dep eza
 ensure_dep curl
 ensure_dep unzip
 bash "$DOTFILES_DIR/setup/fonts.sh"
+
+# Clipboard bridge for terminal tools that read images/text off the clipboard
+# (e.g. pasting an image into Claude Code). They probe xclip first, then
+# wl-paste, so both are installed to cover X11 and Wayland sessions alike.
+ensure_dep xclip
+ensure_dep wl-clipboard
