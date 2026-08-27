@@ -89,6 +89,43 @@ deletes the repo. Open a new shell afterwards — no trace remains.
 dotfiles-update
 ```
 
+## Optional: stop repeated sudo password prompts
+
+Not installed automatically. This touches `/etc`, needs root, and is outside
+what `uninstall.sh` can reverse, so it is a manual step (see the reversibility
+rule in `CLAUDE.md`).
+
+By default Ubuntu caches sudo credentials for 15 minutes and scopes the cache
+to a single terminal, so every new tab or window asks again. A sudoers drop-in
+makes the cache global and non-expiring: one password after login, then no
+prompts until reboot.
+
+```bash
+sudo visudo -f /etc/sudoers.d/timeout
+```
+
+Add these two lines, substituting your username:
+
+```
+Defaults:<your-username> timestamp_type=global
+Defaults:<your-username> timestamp_timeout=-1
+```
+
+`visudo` syntax-checks the file on save and refuses to write a broken one, so
+a typo cannot lock you out of sudo.
+
+Verify from a different terminal than the one you authenticated in:
+
+```bash
+sudo -n true && echo "cached, no prompt"
+```
+
+- Force a re-prompt: `sudo -k`
+- Remove: `sudo rm /etc/sudoers.d/timeout`
+
+Tradeoff: within the cached window, anything running as your user can reach
+root without a prompt. On a guest machine, remove the file when you are done.
+
 ## Commands
 
 ### Navigation
