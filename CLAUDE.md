@@ -51,4 +51,5 @@ it as a manual step instead.
 
 ```bash
 bash tests/test_uninstall.sh
+bash tests/test_install_select.sh
 ```

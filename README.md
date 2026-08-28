@@ -1,8 +1,9 @@
 # nikitas_dotfiles
 
 Modular bash functions and aliases, installable on any machine with a single
-clone + script. Installs any missing dependencies automatically: fzf, wezterm,
-eza, the Noto symbol fonts, and the xclip / wl-clipboard clipboard bridge.
+clone + script. The installer asks what to set up, then installs any missing
+dependencies for the chosen components: fzf, wezterm, eza, the Noto symbol
+fonts, and the xclip / wl-clipboard clipboard bridge.
 
 ## Install
 
@@ -11,6 +12,32 @@ git clone https://github.com/AlfaKeNTAvR/nikitas_dotfiles ~/nikitas_dotfiles
 bash ~/nikitas_dotfiles/install.sh
 source ~/.bashrc
 ```
+
+The installer opens a dialog asking for an installation mode:
+
+| Mode | What it installs |
+|---|---|
+| `full` | Everything (the default, same as before there was a dialog) |
+| `minimal` | Shell config + fzf history search only |
+| `custom` | A checklist: fzf, WezTerm, fonts/eza icons, clipboard bridge |
+
+The shell integration (the `source` line in `~/.bashrc`) is always installed:
+it is the point of the repo. Everything else is optional:
+
+| Component | Contents |
+|---|---|
+| `fzf` | fzf, used by Ctrl+R fuzzy history search |
+| `wezterm` | WezTerm, its apt repo/key, and the managed `wezterm.lua` |
+| `fonts` | eza plus the JetBrainsMono Nerd Font (113 MB) and Noto symbol fonts |
+| `clipboard` | xclip + wl-clipboard |
+
+The dialog uses `whiptail` (preinstalled on Ubuntu) and falls back to plain
+numbered prompts if it is missing. With no terminal attached (piped installer,
+CI) there is nobody to ask, so the full install runs unchanged.
+
+Re-running the installer with a different mode adds the newly selected
+components. It never removes previously installed ones: use `uninstall.sh` for
+that.
 
 ## Windows (manual setup)
 
@@ -162,7 +189,10 @@ root without a prompt. On a guest machine, remove the file when you are done.
 Drop a new `*.sh` file into `bash/lib/`. It will be sourced automatically
 the next time a shell loads (or after `source ~/.bashrc`).
 
-To add a system dependency, call `ensure_dep <package>` in `install.sh`.
+To add a system dependency, call `ensure_dep <package>` from a component
+function in `install.sh` (or add a new component: an `install_<id>` function, an
+entry in `COMPONENT_IDS`, a label in `component_label`, and a case in
+`install_component`).
 It installs only if missing and tracks it for clean removal on uninstall.
 Presence is checked against the apt package name via `dpkg-query`, not the
 binary name, so packages whose binaries differ from the package name (e.g.
@@ -172,7 +202,7 @@ binary name, so packages whose binaries differ from the package name (e.g.
 
 ```
 nikitas_dotfiles/
-├── install.sh          # adds source line to ~/.bashrc, installs deps
+├── install.sh          # component picker, adds source line to ~/.bashrc, installs deps
 ├── uninstall.sh        # removes source line, uninstalls tracked deps
 ├── bash/
 │   ├── init.sh         # sources all *.sh files from bash/lib/
@@ -182,8 +212,10 @@ nikitas_dotfiles/
 │       ├── history.sh   # arrow key history search + Ctrl+R fzf search
 │       └── utils.sh     # .. and ...
 ├── setup/
+│   ├── fonts.sh        # install JetBrainsMono Nerd Font into the user font dir
 │   └── wezterm.sh      # install managed wezterm config (keybindings, bell off)
 ├── tests/
+│   ├── test_install_select.sh
 │   └── test_uninstall.sh
 └── README.md
 ```
