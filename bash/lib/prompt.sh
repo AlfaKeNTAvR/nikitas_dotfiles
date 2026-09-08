@@ -72,9 +72,18 @@ __nikita_set_prompt() {
     # \W = current dir basename (matches the look you liked; use \w for full path).
     # Wrap it in an OSC 8 file:// hyperlink to $PWD so Ctrl+Click opens the folder
     # in VSCode (same open-uri handler that routes eza's file:// links).
-    local dir_url; dir_url="file://$(__nikita_url_encode "$PWD")"
-    local dir_seg="\[\e[1;36m\e]8;;${dir_url}\a\]\W\[\e]8;;\a\e[0m\]"
+    local pwd_encoded; pwd_encoded=$(__nikita_url_encode "$PWD")
+    local dir_seg="\[\e[1;36m\e]8;;file://${pwd_encoded}\a\]\W\[\e]8;;\a\e[0m\]"
     PS1="${env_seg}${dir_seg}${git_seg}\n${__NIKITA_PROMPT_SYMBOL} "
+
+    # OSC 7: report the current directory to the terminal. wezterm reads a local
+    # pane's cwd straight from the OS process table, so this only matters over
+    # SSH, where there is no local process to inspect: without it, splitting an
+    # SSH pane opens the new pane in $HOME instead of here. Printed rather than
+    # folded into PS1 so it can never count toward the measured prompt width.
+    if [[ ${TERM:-dumb} != dumb ]]; then
+        printf '\e]7;file://%s%s\a' "${HOSTNAME:-localhost}" "$pwd_encoded"
+    fi
 }
 
 # Register without clobbering any existing PROMPT_COMMAND (e.g. conda's hooks).
