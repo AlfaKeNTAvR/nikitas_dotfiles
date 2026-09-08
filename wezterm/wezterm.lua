@@ -38,6 +38,30 @@ config.enable_wayland = false
 
 config.font_size = 11.0
 
+-- Scrollbar on the right edge. wezterm ships with it off; without this there is
+-- no visual indicator of position in the scrollback at all. It draws inside the
+-- right window padding (1 cell by default).
+config.enable_scroll_bar = true
+
+-- Bold text. wezterm's default bold face for JetBrains Mono is DemiBold (600),
+-- only one step above Regular, which makes **bold** in Claude Code and other
+-- markdown output hard to pick out. ExtraBold (800) is bundled with wezterm, so
+-- this needs no system font install. Both rules are required: with only the
+-- upright one, bold-italic text would fall back to the upright face and lose
+-- its slant.
+config.font_rules = {
+	{
+		intensity = "Bold",
+		italic = false,
+		font = wezterm.font("JetBrains Mono", { weight = "ExtraBold" }),
+	},
+	{
+		intensity = "Bold",
+		italic = true,
+		font = wezterm.font("JetBrains Mono", { weight = "ExtraBold", style = "Italic" }),
+	},
+}
+
 -- WSL domain for Ubuntu. Splits from a WSL pane stay in WSL automatically
 -- (thanks to domain = "CurrentPaneDomain" on the split keybindings).
 config.wsl_domains = {
