@@ -18,6 +18,8 @@ else
     echo "Not installed — nothing to do."
 fi
 
+# ~/.config/wezterm/local.lua is deliberately untouched here: install never
+# creates it, so it is the user's file and not ours to delete.
 WEZTERM_CONFIG="${HOME}/.config/wezterm/wezterm.lua"
 WEZTERM_BACKUP="$DATA_DIR/wezterm.lua.bak"
 if [[ -f "$WEZTERM_BACKUP" ]]; then

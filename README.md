@@ -89,6 +89,43 @@ Restart WezTerm to take effect.
 - The prompt ends with `>` instead of `$` (matches the native Windows shell).
 - The git-branch glyph shows as a box unless a Nerd Font is loaded.
 
+## Machine-local WezTerm overrides
+
+`install.sh` copies `wezterm/wezterm.lua` over `~/.config/wezterm/wezterm.lua`,
+so any edit made directly to the installed file is lost on the next install or
+update. Anything personal or machine-specific belongs in
+`~/.config/wezterm/local.lua` instead. That file is never created, overwritten,
+or deleted by these dotfiles, so it survives both a reinstall and an uninstall,
+and it stays out of this (public) repo.
+
+It returns a function that receives the config table and the `wezterm` module,
+and mutates the config in place. It is loaded last, so it can override anything
+the managed config sets:
+
+```lua
+-- ~/.config/wezterm/local.lua
+return function(config, wezterm)
+  config.font_size = 12.0
+
+  table.insert(config.ssh_domains, {
+    name = "SSH:mybox",
+    remote_address = "mybox.example.com",
+    username = "nikita",
+    multiplexing = "None",  -- plain ssh; nothing to install on the remote
+    assume_shell = "Posix", -- lets a split open in the current directory
+  })
+end
+```
+
+SSH domains added this way show up in WezTerm's launcher menu, and a split
+inside such a tab opens another channel on the same connection instead of a
+second login. `assume_shell = "Posix"` relies on the OSC 7 sequence this
+repo's prompt emits, so the dotfiles must also be installed on the remote host
+for the current directory to carry over.
+
+A missing `local.lua` is a no-op. A broken one raises a WezTerm config error on
+purpose, rather than being skipped silently.
+
 ## Uninstall (keep repo)
 
 ```bash
@@ -98,6 +135,9 @@ bash ~/nikitas_dotfiles/uninstall.sh
 Removes the source line from `~/.bashrc`, restores the original wezterm
 config, and uninstalls any dependencies that were installed by the script.
 Open a new shell to take effect.
+
+`~/.config/wezterm/local.lua` is left alone: the dotfiles never created it, so
+removing it is not theirs to do. Delete it by hand if you want it gone.
 
 ## Full removal (guest machine)
 

@@ -71,10 +71,13 @@ config.wsl_domains = {
 		default_cwd = "~",
 	},
 }
--- SSH domains. Add entries here to get persistent SSH tabs where splits open
--- new channels on the same host without re-authenticating.
--- Example:
---   { name = "SSH:mybox", remote_address = "mybox.example.com", username = "nikita" },
+-- SSH domains. A tab opened in one of these belongs to the remote host, so
+-- splitting it opens another channel on the same connection: no second login,
+-- no typing ssh again. Splits inherit the domain via domain = "CurrentPaneDomain"
+-- on the split keybindings below.
+--
+-- Left empty on purpose: real hosts are personal, and this repo is public. Add
+-- them in the machine-local file loaded at the bottom of this config, not here.
 config.ssh_domains = {}
 
 -- Tab titles as "N:name", where name is the active pane's folder (or its title
@@ -189,5 +192,36 @@ config.mouse_bindings = {
 -- Broadcast-to-all-panes (Terminator's Shift+Alt+B / Shift+Alt+O) has no native
 -- wezterm equivalent and is intentionally omitted. Keep Terminator around if you
 -- need that workflow.
+
+-- Machine-local overrides. This file is copied over on every install, so any
+-- edit made here is lost; anything personal or per-machine (SSH hosts and
+-- usernames, a different font size, extra keys) belongs in local.lua next to it.
+-- The dotfiles never create, overwrite, or delete local.lua, so it survives both
+-- a reinstall and an uninstall.
+--
+-- local.lua returns a function that receives the config table and the wezterm
+-- module, and mutates the config in place:
+--
+--   return function(config, wezterm)
+--     table.insert(config.ssh_domains, {
+--       name = "SSH:mybox",
+--       remote_address = "mybox.example.com",
+--       username = "nikita",
+--       multiplexing = "None",   -- plain ssh; nothing to install on the remote
+--       assume_shell = "Posix",  -- lets a split open in the current directory
+--     })
+--   end
+--
+-- Loaded last so it can override anything set above. A missing file is a no-op;
+-- a broken one raises, on purpose, rather than failing silently.
+local local_config_path = wezterm.config_dir .. "/local.lua"
+if #wezterm.glob(local_config_path) > 0 then
+	local apply_local = dofile(local_config_path)
+	if type(apply_local) == "function" then
+		apply_local(config, wezterm)
+	else
+		wezterm.log_error("local.lua must return a function(config, wezterm); ignoring it")
+	end
+end
 
 return config
