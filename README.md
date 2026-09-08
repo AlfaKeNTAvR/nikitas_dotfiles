@@ -3,7 +3,8 @@
 Modular bash functions and aliases, installable on any machine with a single
 clone + script. The installer asks what to set up, then installs any missing
 dependencies for the chosen components: fzf, wezterm, eza, the Noto symbol
-fonts, and the xclip / wl-clipboard clipboard bridge.
+fonts, and the xclip / wl-clipboard clipboard bridge. It can also add the
+Russian keyboard layout next to your existing ones.
 
 ## Install
 
@@ -19,7 +20,7 @@ The installer opens a dialog asking for an installation mode:
 |---|---|
 | `full` | Everything (the default, same as before there was a dialog) |
 | `minimal` | Shell config + fzf history search only |
-| `custom` | A checklist: fzf, WezTerm, fonts/eza icons, clipboard bridge |
+| `custom` | A checklist: fzf, WezTerm, fonts/eza icons, clipboard bridge, Russian layout |
 
 The shell integration (the `source` line in `~/.bashrc`) is always installed:
 it is the point of the repo. Everything else is optional:
@@ -30,6 +31,7 @@ it is the point of the repo. Everything else is optional:
 | `wezterm` | WezTerm, its apt repo/key, and the managed `wezterm.lua` |
 | `fonts` | eza plus the JetBrainsMono Nerd Font (113 MB) and Noto symbol fonts |
 | `clipboard` | xclip + wl-clipboard |
+| `russian` | Russian xkb layout added to the GNOME input sources, Super+Space switches |
 
 The dialog uses `whiptail` (preinstalled on Ubuntu) and falls back to plain
 numbered prompts if it is missing. With no terminal attached (piped installer,
@@ -133,8 +135,8 @@ bash ~/nikitas_dotfiles/uninstall.sh
 ```
 
 Removes the source line from `~/.bashrc`, restores the original wezterm
-config, and uninstalls any dependencies that were installed by the script.
-Open a new shell to take effect.
+config and keyboard layout settings, and uninstalls any dependencies that were
+installed by the script. Open a new shell to take effect.
 
 `~/.config/wezterm/local.lua` is left alone: the dotfiles never created it, so
 removing it is not theirs to do. Delete it by hand if you want it gone.
@@ -253,6 +255,7 @@ nikitas_dotfiles/
 │       └── utils.sh     # .. and ...
 ├── setup/
 │   ├── fonts.sh        # install JetBrainsMono Nerd Font into the user font dir
+│   ├── keyboard-ru.sh  # add the Russian layout + Super+Space switch (GNOME gsettings)
 │   └── wezterm.sh      # install managed wezterm config (keybindings, bell off)
 ├── tests/
 │   ├── test_install_select.sh

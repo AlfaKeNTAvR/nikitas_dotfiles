@@ -10,7 +10,7 @@ APT_FILES_LOG="$DATA_DIR/added_apt_files"
 
 # Optional components, in install order. The shell integration (source line in
 # ~/.bashrc) is not listed: it is the point of the repo and always installed.
-COMPONENT_IDS=(fzf wezterm fonts clipboard)
+COMPONENT_IDS=(fzf wezterm fonts clipboard russian)
 
 component_label() {
     case "$1" in
@@ -18,6 +18,7 @@ component_label() {
         wezterm)   echo "WezTerm terminal + managed config" ;;
         fonts)     echo "eza + Nerd Font icons (113 MB download)" ;;
         clipboard) echo "xclip + wl-clipboard clipboard bridge" ;;
+        russian)   echo "Russian keyboard layout, Super+Space to switch" ;;
         *)         echo "$1" ;;
     esac
 }
@@ -119,12 +120,19 @@ install_clipboard() {
     ensure_dep wl-clipboard
 }
 
+install_russian() {
+    # Layout only: the GNOME input source plus the Super+Space switch. No locale
+    # change and no language packs, so the UI stays English.
+    bash "$DOTFILES_DIR/setup/keyboard-ru.sh"
+}
+
 install_component() {
     case "$1" in
         fzf)       install_fzf ;;
         wezterm)   install_wezterm ;;
         fonts)     install_fonts ;;
         clipboard) install_clipboard ;;
+        russian)   install_russian ;;
         *)         echo "Unknown component: $1" >&2; return 1 ;;
     esac
 }

@@ -31,6 +31,22 @@ elif [[ -f "$WEZTERM_CONFIG" ]] && head -n1 "$WEZTERM_CONFIG" | grep -qF 'nikita
     echo "Removed wezterm config."
 fi
 
+# Restore the GNOME keyboard layout settings the Russian component changed.
+# Each line is "schema key value", ready to hand back to `gsettings set`.
+GNOME_INPUT_BACKUP="$DATA_DIR/gnome-input-sources.bak"
+if [[ -f "$GNOME_INPUT_BACKUP" ]]; then
+    if command -v gsettings >/dev/null 2>&1; then
+        while read -r schema key value; do
+            [[ -z "$schema" ]] && continue
+            gsettings set "$schema" "$key" "$value" || true
+        done < "$GNOME_INPUT_BACKUP"
+        echo "Restored original keyboard layout settings."
+    else
+        echo "gsettings missing - leaving keyboard layout settings as they are."
+    fi
+    rm -f "$GNOME_INPUT_BACKUP"
+fi
+
 # Remove the Nerd Font we installed (lives in our own subdir).
 FONT_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/fonts/nikitas_dotfiles"
 if [[ -d "$FONT_DIR" ]]; then
