@@ -3,8 +3,9 @@
 Modular bash functions and aliases, installable on any machine with a single
 clone + script. The installer asks what to set up, then installs any missing
 dependencies for the chosen components: fzf, wezterm, eza, the Noto symbol
-fonts, the xclip / wl-clipboard clipboard bridge, and the Fresh text editor. It
-can also add the Russian keyboard layout next to your existing ones.
+fonts, the xclip / wl-clipboard clipboard bridge, the Fresh text editor, and
+the lazygit and serie git tools. It can also add the Russian keyboard layout
+next to your existing ones.
 
 ## Install
 
@@ -20,7 +21,7 @@ The installer opens a dialog asking for an installation mode:
 |---|---|
 | `full` | Everything (the default, same as before there was a dialog) |
 | `minimal` | Shell config + fzf history search only |
-| `custom` | A checklist: fzf, WezTerm, fonts/eza icons, clipboard bridge, Russian layout, Fresh |
+| `custom` | A checklist: fzf, WezTerm, fonts/eza icons, clipboard bridge, Russian layout, Fresh, lazygit, serie |
 
 The shell integration (the `source` line in `~/.bashrc`) is always installed:
 it is the point of the repo. Everything else is optional:
@@ -33,6 +34,8 @@ it is the point of the repo. Everything else is optional:
 | `clipboard` | xclip + wl-clipboard |
 | `russian` | Russian xkb layout added to the GNOME input sources, Super+Space switches |
 | `fresh` | [Fresh](https://github.com/sinelaw/fresh) terminal editor, from the latest release's `.deb` (amd64/arm64) |
+| `lazygit` | [lazygit](https://github.com/jesseduffield/lazygit) git TUI, release binary into `~/.local/bin` |
+| `serie` | [serie](https://github.com/lusingander/serie) git commit graph viewer, release binary into `~/.local/bin` |
 
 The dialog uses `whiptail` (preinstalled on Ubuntu) and falls back to plain
 numbered prompts if it is missing. With no terminal attached (piped installer,
@@ -253,6 +256,7 @@ nikitas_dotfiles/
 │       ├── bookmarks.sh # badd, bcd, brm, bls, b
 │       ├── dotfiles.sh  # dotfiles-update, dotfiles-nuke, claude-config, claude-dotfiles
 │       ├── history.sh   # arrow key history search + Ctrl+R fzf search
+│       ├── path.sh      # puts ~/.local/bin (lazygit, serie) on PATH
 │       └── utils.sh     # .. and ...
 ├── setup/
 │   ├── fonts.sh        # install JetBrainsMono Nerd Font into the user font dir

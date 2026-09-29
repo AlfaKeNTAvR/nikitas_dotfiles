@@ -7,10 +7,12 @@ BASHRC="$HOME/.bashrc"
 DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nikitas_dotfiles"
 DEPS_FILE="$DATA_DIR/installed_deps"
 APT_FILES_LOG="$DATA_DIR/added_apt_files"
+BIN_DIR="$HOME/.local/bin"
+BINS_FILE="$DATA_DIR/installed_bins"
 
 # Optional components, in install order. The shell integration (source line in
 # ~/.bashrc) is not listed: it is the point of the repo and always installed.
-COMPONENT_IDS=(fzf wezterm fonts clipboard russian fresh)
+COMPONENT_IDS=(fzf wezterm fonts clipboard russian fresh lazygit serie)
 
 component_label() {
     case "$1" in
@@ -20,6 +22,8 @@ component_label() {
         clipboard) echo "xclip + wl-clipboard clipboard bridge" ;;
         russian)   echo "Russian keyboard layout, Super+Space to switch" ;;
         fresh)     echo "Fresh terminal text editor" ;;
+        lazygit)   echo "lazygit - git TUI for staging, commits, branches" ;;
+        serie)     echo "serie - git commit graph viewer" ;;
         *)         echo "$1" ;;
     esac
 }
@@ -75,6 +79,59 @@ ensure_wezterm_repo() {
     fi
     [[ "$need_update" -eq 1 ]] && sudo apt update
     return 0
+}
+
+# Print the tag (e.g. v1.2.3) of a GitHub repo's latest release. Follows the
+# /releases/latest redirect instead of calling the rate-limited GitHub API.
+latest_release_tag() {
+    local repo="$1"
+    local release_url tag
+    release_url="$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+        "https://github.com/$repo/releases/latest")" || {
+        echo "Could not reach GitHub to find the latest $repo release." >&2
+        return 1
+    }
+    tag="${release_url##*/}"
+    if [[ "$tag" != v* ]]; then
+        echo "Unexpected $repo release URL: $release_url" >&2
+        return 1
+    fi
+    echo "$tag"
+}
+
+# Install a single binary from a release tarball into ~/.local/bin, for tools
+# with no apt package. Skipped when the command already exists anywhere on
+# PATH. Each binary we add is recorded in BINS_FILE so uninstall deletes only
+# those. With a checksums URL (sha256sum format), the tarball is verified
+# against it before anything is unpacked.
+ensure_release_binary() {
+    local name="$1" tarball_url="$2" checksums_url="${3:-}"
+    local tmp_dir tarball
+
+    if type -P "$name" >/dev/null 2>&1; then
+        return 0
+    fi
+
+    tmp_dir="$(mktemp -d)"
+    tarball="${tarball_url##*/}"
+    echo "Downloading $name..."
+    curl -fsSL -o "$tmp_dir/$tarball" "$tarball_url"
+    if [[ -n "$checksums_url" ]]; then
+        curl -fsSL -o "$tmp_dir/checksums.txt" "$checksums_url"
+        if ! (cd "$tmp_dir" && grep "  $tarball\$" checksums.txt | sha256sum -c --quiet); then
+            echo "$name download failed its checksum - not installing it." >&2
+            rm -rf "$tmp_dir"
+            return 1
+        fi
+    fi
+
+    tar -xzf "$tmp_dir/$tarball" -C "$tmp_dir" "$name"
+    mkdir -p "$BIN_DIR"
+    install -m 755 "$tmp_dir/$name" "$BIN_DIR/$name"
+    rm -rf "$tmp_dir"
+    mkdir -p "$(dirname "$BINS_FILE")"
+    echo "$BIN_DIR/$name" >> "$BINS_FILE"
+    echo "Installed $name to $BIN_DIR."
 }
 
 # ------------------------------------------------------------- components ---
@@ -135,7 +192,7 @@ install_russian() {
 # ensure_dep records the package, so uninstall removes it like any other.
 install_fresh() {
     local pkg="fresh-editor"
-    local arch release_url tag version deb_name deb_url tmp_dir
+    local arch tag version deb_name deb_url tmp_dir
 
     is_pkg_installed "$pkg" && return 0
     ensure_dep curl
@@ -146,17 +203,7 @@ install_fresh() {
         return 0
     fi
 
-    # /releases/latest redirects to /releases/tag/vX.Y.Z, which names the version
-    # without needing the rate-limited GitHub API.
-    release_url="$(curl -fsSL -o /dev/null -w '%{url_effective}'         https://github.com/sinelaw/fresh/releases/latest)" || {
-        echo "Could not reach GitHub to find the latest Fresh release." >&2
-        return 1
-    }
-    tag="${release_url##*/}"
-    if [[ "$tag" != v* ]]; then
-        echo "Unexpected Fresh release URL: $release_url" >&2
-        return 1
-    fi
+    tag="$(latest_release_tag sinelaw/fresh)"
     version="${tag#v}"
     deb_name="${pkg}_${version}-1_${arch}.deb"
     deb_url="https://github.com/sinelaw/fresh/releases/download/$tag/$deb_name"
@@ -179,6 +226,39 @@ install_fresh() {
     rm -rf "$tmp_dir"
 }
 
+# lazygit publishes plain tarballs plus a checksums.txt, but no .deb.
+install_lazygit() {
+    local arch tag version base
+    ensure_dep curl
+    case "$(uname -m)" in
+        x86_64)  arch=x86_64 ;;
+        aarch64) arch=arm64 ;;
+        *)       echo "No lazygit build for $(uname -m) - skipping lazygit." >&2; return 0 ;;
+    esac
+    tag="$(latest_release_tag jesseduffield/lazygit)"
+    version="${tag#v}"
+    base="https://github.com/jesseduffield/lazygit/releases/download/$tag"
+    ensure_release_binary lazygit \
+        "$base/lazygit_${version}_linux_${arch}.tar.gz" "$base/checksums.txt"
+}
+
+# serie publishes static (musl) tarballs with no checksum file, so the download
+# is trusted on HTTPS alone. It draws the commit graph with terminal image
+# protocols, which WezTerm supports.
+install_serie() {
+    local arch tag version
+    ensure_dep curl
+    case "$(uname -m)" in
+        x86_64)  arch=x86_64 ;;
+        aarch64) arch=aarch64 ;;
+        *)       echo "No serie build for $(uname -m) - skipping serie." >&2; return 0 ;;
+    esac
+    tag="$(latest_release_tag lusingander/serie)"
+    version="${tag#v}"
+    ensure_release_binary serie \
+        "https://github.com/lusingander/serie/releases/download/$tag/serie-${version}-${arch}-unknown-linux-musl.tar.gz"
+}
+
 install_component() {
     case "$1" in
         fzf)       install_fzf ;;
@@ -187,6 +267,8 @@ install_component() {
         clipboard) install_clipboard ;;
         russian)   install_russian ;;
         fresh)     install_fresh ;;
+        lazygit)   install_lazygit ;;
+        serie)     install_serie ;;
         *)         echo "Unknown component: $1" >&2; return 1 ;;
     esac
 }

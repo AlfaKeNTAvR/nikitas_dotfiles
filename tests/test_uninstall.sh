@@ -34,6 +34,12 @@ setup() {
     # Empty deps file (no real packages, avoids actual apt calls)
     touch "$FAKE_DEPS_FILE"
 
+    # One release binary install added, and one the user put there themselves
+    FAKE_LOCAL_BIN="$FAKE_HOME/.local/bin"
+    mkdir -p "$FAKE_LOCAL_BIN"
+    touch "$FAKE_LOCAL_BIN/lazygit" "$FAKE_LOCAL_BIN/users-own-tool"
+    echo "$FAKE_LOCAL_BIN/lazygit" > "$FAKE_DEPS_DIR/installed_bins"
+
     # Fake sudo + apt so no real packages are touched
     FAKE_BIN="$TEMP_DIR/bin"
     mkdir -p "$FAKE_BIN"
@@ -60,6 +66,15 @@ test_uninstall() {
 
     assert "deps file removed" \
         "[[ ! -f '$FAKE_DEPS_FILE' ]]"
+
+    assert "installed release binary removed" \
+        "[[ ! -f '$FAKE_LOCAL_BIN/lazygit' ]]"
+
+    assert "binary not installed by us is kept" \
+        "[[ -f '$FAKE_LOCAL_BIN/users-own-tool' ]]"
+
+    assert "installed_bins list removed" \
+        "[[ ! -f '$FAKE_DEPS_DIR/installed_bins' ]]"
 
     assert "repo still exists" \
         "[[ -d '$DOTFILES_DIR' ]]"

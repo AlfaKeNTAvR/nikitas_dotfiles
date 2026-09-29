@@ -27,7 +27,11 @@ Checklist for any new feature that touches the host:
    created in `added_apt_files` so `uninstall.sh` removes only what was added
    (never a repo the machine already had). See `ensure_wezterm_repo` in
    `install.sh` for the pattern.
-5. **Anything else** (systemd units, cron jobs, symlinks, etc.) — record what
+5. **Tools with no apt package** — prefer the project's `.deb` through
+   `ensure_dep <pkg> <file.deb>` (see `install_fresh`). With only a release
+   tarball, use `ensure_release_binary`, which puts the binary in
+   `~/.local/bin` and records it in `installed_bins` for `uninstall.sh`.
+6. **Anything else** (systemd units, cron jobs, symlinks, etc.) — record what
    was added and write the removal logic in `uninstall.sh`.
 
 If a change can't be cleanly reversed, don't make it automatically — document

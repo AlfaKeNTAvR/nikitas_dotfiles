@@ -7,6 +7,7 @@ BASHRC="$HOME/.bashrc"
 DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nikitas_dotfiles"
 DEPS_FILE="$DATA_DIR/installed_deps"
 APT_FILES_LOG="$DATA_DIR/added_apt_files"
+BINS_FILE="$DATA_DIR/installed_bins"
 
 if grep -qF "$SOURCE_LINE" "$BASHRC" 2>/dev/null; then
     grep -vF "$SOURCE_LINE" "$BASHRC" \
@@ -53,6 +54,17 @@ if [[ -d "$FONT_DIR" ]]; then
     rm -rf "$FONT_DIR"
     fc-cache -f >/dev/null 2>&1 || true
     echo "Removed installed Nerd Font."
+fi
+
+# Delete the release binaries install put in ~/.local/bin (and only those).
+if [[ -f "$BINS_FILE" ]]; then
+    while IFS= read -r bin; do
+        if [[ -n "$bin" && -f "$bin" ]]; then
+            rm -f "$bin"
+            echo "Removed $bin"
+        fi
+    done < "$BINS_FILE"
+    rm -f "$BINS_FILE"
 fi
 
 if [[ -f "$DEPS_FILE" ]]; then
