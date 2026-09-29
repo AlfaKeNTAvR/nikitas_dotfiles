@@ -42,7 +42,7 @@ install_component() { INSTALLED+=("$1"); }
 echo "Running install selection tests..."
 
 assert_eq "full preset installs every component" \
-    "fzf wezterm fonts clipboard russian" \
+    "fzf wezterm fonts clipboard russian fresh" \
     "$(resolve_preset full | paste -sd ' ')"
 
 assert_eq "minimal preset installs fzf only" \
@@ -52,7 +52,7 @@ assert_eq "minimal preset installs fzf only" \
 assert_fails "unknown preset is rejected" "resolve_preset bogus"
 
 assert_eq "empty custom answer means all components" \
-    "fzf wezterm fonts clipboard russian" \
+    "fzf wezterm fonts clipboard russian fresh" \
     "$(parse_component_choice '' | paste -sd ' ')"
 
 assert_eq "'none' custom answer means no components" \
@@ -78,7 +78,7 @@ assert_fails "non-numeric pick is rejected" "parse_component_choice 'wezterm'"
 INSTALLED=()
 main </dev/null >/dev/null 2>&1
 assert_eq "no-terminal run installs everything" \
-    "shell fzf wezterm fonts clipboard russian" \
+    "shell fzf wezterm fonts clipboard russian fresh" \
     "${INSTALLED[*]}"
 
 echo ""

@@ -10,7 +10,7 @@ APT_FILES_LOG="$DATA_DIR/added_apt_files"
 
 # Optional components, in install order. The shell integration (source line in
 # ~/.bashrc) is not listed: it is the point of the repo and always installed.
-COMPONENT_IDS=(fzf wezterm fonts clipboard russian)
+COMPONENT_IDS=(fzf wezterm fonts clipboard russian fresh)
 
 component_label() {
     case "$1" in
@@ -19,6 +19,7 @@ component_label() {
         fonts)     echo "eza + Nerd Font icons (113 MB download)" ;;
         clipboard) echo "xclip + wl-clipboard clipboard bridge" ;;
         russian)   echo "Russian keyboard layout, Super+Space to switch" ;;
+        fresh)     echo "Fresh terminal text editor" ;;
         *)         echo "$1" ;;
     esac
 }
@@ -34,12 +35,15 @@ is_pkg_installed() {
     [[ "$(dpkg-query -W -f='${db:Status-Status}' "$pkg" 2>/dev/null)" == "installed" ]]
 }
 
-# Install a package only if missing; record it so uninstall can clean up
+# Install a package only if missing; record it so uninstall can clean up.
+# The optional second argument is what apt installs instead of the package name,
+# e.g. a downloaded .deb file for software that has no apt repo.
 ensure_dep() {
     local pkg="$1"
+    local source="${2:-$1}"
     if ! is_pkg_installed "$pkg"; then
         echo "Installing $pkg..."
-        sudo apt install -y "$pkg"
+        sudo apt install -y "$source"
         mkdir -p "$(dirname "$DEPS_FILE")"
         echo "$pkg" >> "$DEPS_FILE"
     fi
@@ -126,6 +130,55 @@ install_russian() {
     bash "$DOTFILES_DIR/setup/keyboard-ru.sh"
 }
 
+# Fresh has no apt repo, so fetch the latest release's .deb from GitHub, check
+# it against its published sha256, and install it through apt. Going through
+# ensure_dep records the package, so uninstall removes it like any other.
+install_fresh() {
+    local pkg="fresh-editor"
+    local arch release_url tag version deb_name deb_url tmp_dir
+
+    is_pkg_installed "$pkg" && return 0
+    ensure_dep curl
+
+    arch="$(dpkg --print-architecture)"
+    if [[ "$arch" != amd64 && "$arch" != arm64 ]]; then
+        echo "No Fresh .deb for $arch - skipping Fresh." >&2
+        return 0
+    fi
+
+    # /releases/latest redirects to /releases/tag/vX.Y.Z, which names the version
+    # without needing the rate-limited GitHub API.
+    release_url="$(curl -fsSL -o /dev/null -w '%{url_effective}'         https://github.com/sinelaw/fresh/releases/latest)" || {
+        echo "Could not reach GitHub to find the latest Fresh release." >&2
+        return 1
+    }
+    tag="${release_url##*/}"
+    if [[ "$tag" != v* ]]; then
+        echo "Unexpected Fresh release URL: $release_url" >&2
+        return 1
+    fi
+    version="${tag#v}"
+    deb_name="${pkg}_${version}-1_${arch}.deb"
+    deb_url="https://github.com/sinelaw/fresh/releases/download/$tag/$deb_name"
+
+    tmp_dir="$(mktemp -d)"
+    echo "Downloading Fresh $version..."
+    curl -fsSL -o "$tmp_dir/$deb_name" "$deb_url"
+    curl -fsSL -o "$tmp_dir/$deb_name.sha256" "$deb_url.sha256"
+    if ! (cd "$tmp_dir" && echo "$(cut -d' ' -f1 "$deb_name.sha256")  $deb_name" | sha256sum -c --quiet); then
+        echo "Fresh download failed its checksum - not installing it." >&2
+        rm -rf "$tmp_dir"
+        return 1
+    fi
+
+    # apt runs as the _apt user, which cannot read a mktemp dir, so hand it a
+    # world-readable copy.
+    chmod 755 "$tmp_dir"
+    chmod 644 "$tmp_dir/$deb_name"
+    ensure_dep "$pkg" "$tmp_dir/$deb_name"
+    rm -rf "$tmp_dir"
+}
+
 install_component() {
     case "$1" in
         fzf)       install_fzf ;;
@@ -133,6 +186,7 @@ install_component() {
         fonts)     install_fonts ;;
         clipboard) install_clipboard ;;
         russian)   install_russian ;;
+        fresh)     install_fresh ;;
         *)         echo "Unknown component: $1" >&2; return 1 ;;
     esac
 }

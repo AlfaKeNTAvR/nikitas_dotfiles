@@ -3,8 +3,8 @@
 Modular bash functions and aliases, installable on any machine with a single
 clone + script. The installer asks what to set up, then installs any missing
 dependencies for the chosen components: fzf, wezterm, eza, the Noto symbol
-fonts, and the xclip / wl-clipboard clipboard bridge. It can also add the
-Russian keyboard layout next to your existing ones.
+fonts, the xclip / wl-clipboard clipboard bridge, and the Fresh text editor. It
+can also add the Russian keyboard layout next to your existing ones.
 
 ## Install
 
@@ -20,7 +20,7 @@ The installer opens a dialog asking for an installation mode:
 |---|---|
 | `full` | Everything (the default, same as before there was a dialog) |
 | `minimal` | Shell config + fzf history search only |
-| `custom` | A checklist: fzf, WezTerm, fonts/eza icons, clipboard bridge, Russian layout |
+| `custom` | A checklist: fzf, WezTerm, fonts/eza icons, clipboard bridge, Russian layout, Fresh |
 
 The shell integration (the `source` line in `~/.bashrc`) is always installed:
 it is the point of the repo. Everything else is optional:
@@ -32,6 +32,7 @@ it is the point of the repo. Everything else is optional:
 | `fonts` | eza plus the JetBrainsMono Nerd Font (113 MB) and Noto symbol fonts |
 | `clipboard` | xclip + wl-clipboard |
 | `russian` | Russian xkb layout added to the GNOME input sources, Super+Space switches |
+| `fresh` | [Fresh](https://github.com/sinelaw/fresh) terminal editor, from the latest release's `.deb` (amd64/arm64) |
 
 The dialog uses `whiptail` (preinstalled on Ubuntu) and falls back to plain
 numbered prompts if it is missing. With no terminal attached (piped installer,
